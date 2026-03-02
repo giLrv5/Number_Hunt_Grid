@@ -10,6 +10,7 @@ let expectedNumber = 1;
 let startTime = null;
 let lastActivatedCell = null;
 let lastActivationTime = 0;
+let isGameActive = false;
 
 function isTouchDevice() {
   return navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
@@ -31,6 +32,20 @@ function showDesktopWarning() {
   statusText.textContent = '此遊戲僅限「可觸控」的手機或平板裝置使用。請改用手機/平板開啟。';
   grid.classList.add('hidden');
   resultText.classList.add('hidden');
+}
+
+function resetToIdleState() {
+  isGameActive = false;
+  expectedNumber = 1;
+  startTime = null;
+  lastActivatedCell = null;
+  lastActivationTime = 0;
+  grid.innerHTML = '';
+  grid.classList.add('hidden');
+  resultText.classList.add('hidden');
+  resultText.textContent = '';
+  statusText.textContent = '尚未開始';
+  startButton.textContent = '開始';
 }
 
 function shuffle(numbers) {
@@ -62,30 +77,32 @@ function startGame() {
     return;
   }
 
+  isGameActive = true;
   expectedNumber = 1;
   startTime = performance.now();
   lastActivatedCell = null;
   lastActivationTime = 0;
-  buildGrid();
 
+  buildGrid();
   resultText.classList.add('hidden');
   resultText.textContent = '';
-
   grid.classList.remove('hidden');
   startButton.textContent = '重新開始';
   statusText.textContent = '請找：1';
 }
 
 function finishGame() {
+  isGameActive = false;
   const elapsedMs = performance.now() - startTime;
   const seconds = (elapsedMs / 1000).toFixed(2);
   statusText.textContent = '完成！';
   resultText.textContent = `完成時間：${seconds} 秒`;
   resultText.classList.remove('hidden');
+  startButton.textContent = '開始';
 }
 
 function activateCell(target) {
-  if (!(target instanceof HTMLButtonElement) || target.classList.contains('correct')) {
+  if (!isGameActive || !(target instanceof HTMLButtonElement) || target.classList.contains('correct')) {
     return;
   }
 
@@ -157,12 +174,29 @@ function handleGridInteraction(event) {
   activateCell(target);
 }
 
+function handleStartButtonClick() {
+  if (isGameActive || !grid.classList.contains('hidden')) {
+    resetToIdleState();
+    return;
+  }
+
+  startGame();
+}
+
+function preventTapZoom(event) {
+  event.preventDefault();
+}
+
 grid.addEventListener('touchstart', handleGridInteraction, { passive: false });
 grid.addEventListener('pointerdown', handleGridInteraction);
 grid.addEventListener('click', handleGridInteraction);
+document.addEventListener('dblclick', preventTapZoom, { passive: false });
+document.addEventListener('gesturestart', preventTapZoom, { passive: false });
 
 if (!canPlayGameOnThisDevice()) {
   showDesktopWarning();
+} else {
+  resetToIdleState();
 }
 
-startButton.addEventListener('click', startGame);
+startButton.addEventListener('click', handleStartButtonClick);
