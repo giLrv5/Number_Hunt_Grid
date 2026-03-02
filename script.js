@@ -4,10 +4,12 @@ const grid = document.getElementById('grid');
 const resultText = document.getElementById('result');
 
 const TOTAL = 25;
+const SYNTHETIC_CLICK_GUARD_MS = 450;
 
 let expectedNumber = 1;
 let startTime = null;
 let lastActivatedCell = null;
+let lastActivationTime = 0;
 
 function isTouchDevice() {
   return navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
@@ -62,6 +64,8 @@ function startGame() {
 
   expectedNumber = 1;
   startTime = performance.now();
+  lastActivatedCell = null;
+  lastActivationTime = 0;
   buildGrid();
 
   resultText.classList.add('hidden');
@@ -86,13 +90,11 @@ function activateCell(target) {
   }
 
   const clickedValue = Number(target.dataset.value);
-
   if (clickedValue !== expectedNumber) {
     return;
   }
 
   target.classList.add('correct');
-  target.disabled = true;
 
   if (expectedNumber === TOTAL) {
     finishGame();
@@ -103,27 +105,59 @@ function activateCell(target) {
   statusText.textContent = `請找：${expectedNumber}`;
 }
 
+function findCellFromTouch(event) {
+  if (!('changedTouches' in event) || event.changedTouches.length === 0) {
+    return null;
+  }
+
+  const touch = event.changedTouches[0];
+  const touchedElement = document.elementFromPoint(touch.clientX, touch.clientY);
+
+  if (!(touchedElement instanceof HTMLElement)) {
+    return null;
+  }
+
+  return touchedElement.closest('.cell');
+}
+
+function shouldSkipSyntheticClick(target) {
+  const elapsed = performance.now() - lastActivationTime;
+  return target === lastActivatedCell && elapsed < SYNTHETIC_CLICK_GUARD_MS;
+}
+
 function handleGridInteraction(event) {
-  const target = event.target;
+  const isTouchStart = event.type === 'touchstart';
+  const isPointerDown = event.type === 'pointerdown';
+  const isClick = event.type === 'click';
+
+  let target = null;
+
+  if (isTouchStart) {
+    target = findCellFromTouch(event);
+  } else if (event.target instanceof HTMLElement) {
+    target = event.target.closest('.cell');
+  }
+
   if (!(target instanceof HTMLButtonElement)) {
     return;
   }
 
-  if (event.type === 'pointerdown') {
+  if (isTouchStart || isPointerDown) {
     event.preventDefault();
     lastActivatedCell = target;
+    lastActivationTime = performance.now();
     activateCell(target);
     return;
   }
 
-  if (target === lastActivatedCell) {
-    lastActivatedCell = null;
+  if (isClick && shouldSkipSyntheticClick(target)) {
     return;
   }
 
   activateCell(target);
 }
 
+grid.addEventListener('touchstart', handleGridInteraction, { passive: false });
 grid.addEventListener('pointerdown', handleGridInteraction);
 grid.addEventListener('click', handleGridInteraction);
 

@@ -75,13 +75,19 @@ h1 {
   background: #f9fbff;
   cursor: pointer;
   user-select: none;
-  transition: transform 0.1s ease, background 0.2s ease;
+  transition: background 0.12s ease;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
-.cell:hover {
-  transform: translateY(-1px);
+.cell:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cell:hover {
+    transform: translateY(-1px);
+  }
 }
 
 .cell.correct {
@@ -89,6 +95,7 @@ h1 {
   color: #22753b;
   border-color: #86ce9a;
   cursor: default;
+  pointer-events: none;
 }
 
 .hidden {
