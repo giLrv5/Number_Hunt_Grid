@@ -7,6 +7,7 @@ const TOTAL = 25;
 
 let expectedNumber = 1;
 let startTime = null;
+let lastActivatedCell = null;
 
 function isTouchDevice() {
   return navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
@@ -79,15 +80,14 @@ function finishGame() {
   resultText.classList.remove('hidden');
 }
 
-grid.addEventListener('click', (event) => {
-  const target = event.target;
-  if (!(target instanceof HTMLButtonElement)) {
+function activateCell(target) {
+  if (!(target instanceof HTMLButtonElement) || target.classList.contains('correct')) {
     return;
   }
 
   const clickedValue = Number(target.dataset.value);
 
-  if (clickedValue !== expectedNumber || target.classList.contains('correct')) {
+  if (clickedValue !== expectedNumber) {
     return;
   }
 
@@ -101,7 +101,31 @@ grid.addEventListener('click', (event) => {
 
   expectedNumber += 1;
   statusText.textContent = `請找：${expectedNumber}`;
-});
+}
+
+function handleGridInteraction(event) {
+  const target = event.target;
+  if (!(target instanceof HTMLButtonElement)) {
+    return;
+  }
+
+  if (event.type === 'pointerdown') {
+    event.preventDefault();
+    lastActivatedCell = target;
+    activateCell(target);
+    return;
+  }
+
+  if (target === lastActivatedCell) {
+    lastActivatedCell = null;
+    return;
+  }
+
+  activateCell(target);
+}
+
+grid.addEventListener('pointerdown', handleGridInteraction);
+grid.addEventListener('click', handleGridInteraction);
 
 if (!canPlayGameOnThisDevice()) {
   showDesktopWarning();

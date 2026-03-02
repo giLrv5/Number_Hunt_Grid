@@ -58,6 +58,7 @@ h1 {
 
 .grid {
   display: grid;
+  touch-action: manipulation;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
 }
@@ -75,6 +76,8 @@ h1 {
   cursor: pointer;
   user-select: none;
   transition: transform 0.1s ease, background 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .cell:hover {
