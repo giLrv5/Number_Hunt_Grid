@@ -37,7 +37,7 @@ h1 {
   margin-bottom: 16px;
 }
 
-button {
+.start-button {
   border: none;
   border-radius: 8px;
   padding: 10px 16px;
@@ -47,7 +47,7 @@ button {
   cursor: pointer;
 }
 
-button:disabled {
+.start-button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -64,6 +64,7 @@ button:disabled {
 
 .cell {
   aspect-ratio: 1;
+  color: #1e2430;
   border: 1px solid #c7d1e6;
   border-radius: 10px;
   display: grid;
