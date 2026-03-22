@@ -17,16 +17,17 @@
 <body>
   <main class="app">
     <h1>舒爾特方格（1~25）</h1>
-    <p class="note">依序點擊 1 到 25。點擊「開始」後才會顯示方格內容。</p>
+    <p class="intro">依序點擊 1 到 25。點擊「開始」後，會先在畫面中央倒數 3 秒，倒數結束才會顯示方格內容。</p>
 
     <div class="controls">
       <button id="startButton" class="start-button" type="button">開始</button>
       <span id="status" class="status">尚未開始</span>
     </div>
 
+    <div id="countdown" class="countdown hidden" aria-live="assertive"></div>
     <div id="grid" class="grid hidden" aria-live="polite"></div>
 
-    <p id="result" class="result hidden" aria-live="polite"></p>
+    <section id="result" class="result hidden" aria-live="polite"></section>
   </main>
 
   <script src="script.js"></script>
