@@ -195,6 +195,40 @@ function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
   }, 1000);
 }
 
+function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
+  if (!canPlayGameOnThisDevice()) {
+    showDesktopWarning();
+    return;
+  }
+
+  clearCountdownTimer();
+  isGameActive = false;
+  expectedNumber = 1;
+  startTime = null;
+  lastActivatedCell = null;
+  lastActivationTime = 0;
+  errorCount = 0;
+  resultText.classList.add('hidden');
+  resultText.innerHTML = '';
+  grid.innerHTML = '';
+  startButton.disabled = true;
+  startButton.textContent = '倒數中...';
+  statusText.textContent = `倒數 ${secondsRemaining} 秒`;
+  showCountdown(secondsRemaining);
+
+  if (secondsRemaining <= 1) {
+    countdownTimerId = window.setTimeout(() => {
+      countdownTimerId = null;
+      beginActiveGame();
+    }, 1000);
+    return;
+  }
+
+  countdownTimerId = window.setTimeout(() => {
+    startCountdown(secondsRemaining - 1);
+  }, 1000);
+}
+
 function finishGame() {
   isGameActive = false;
   const elapsedMs = performance.now() - startTime;
@@ -282,6 +316,19 @@ function highlightErrorItems(totalErrors) {
     const activeClass = isActive ? 'note-item--active' : '';
     return `<li class="${activeClass}">${item.text}</li>`;
   }).join('');
+}
+
+function formatElapsedTime(elapsedMs) {
+  const totalSeconds = elapsedMs / 1000;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const secondsText = seconds.toFixed(2);
+
+  if (minutes === 0) {
+    return `${secondsText} 秒`;
+  }
+
+  return `${minutes} 分 ${secondsText} 秒`;
 }
 
 function activateCell(target) {
