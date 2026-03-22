@@ -27,7 +27,47 @@ h1 {
 
 .note {
   margin: 0 0 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f8faff;
   color: #4d5a71;
+}
+
+.note-intro {
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+
+.note-group + .note-group {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #dbe4f5;
+}
+
+.note-group h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: #1e2430;
+}
+
+.note-group ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.note-group li + li {
+  margin-top: 6px;
+}
+
+.note-highlight {
+  margin: 12px 0 0;
+  line-height: 1.6;
+  font-weight: 600;
+  color: #31415f;
+}
+
+.note-group--errors h2 {
+  color: #1844c6;
 }
 
 .controls {
@@ -114,7 +154,22 @@ h1 {
 
 .result {
   margin: 16px 0 0;
-  font-size: 1.1rem;
-  font-weight: 700;
+  padding: 16px;
+  border-radius: 12px;
+  background: #eef4ff;
   color: #1844c6;
+}
+
+.result-title {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.result-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.result-list li + li {
+  margin-top: 8px;
 }
