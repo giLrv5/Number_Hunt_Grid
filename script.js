@@ -1,9 +1,11 @@
 const startButton = document.getElementById('startButton');
 const statusText = document.getElementById('status');
+const countdownText = document.getElementById('countdown');
 const grid = document.getElementById('grid');
 const resultText = document.getElementById('result');
 
 const TOTAL = 25;
+const COUNTDOWN_SECONDS = 3;
 const SYNTHETIC_CLICK_GUARD_MS = 450;
 
 let expectedNumber = 1;
@@ -11,6 +13,7 @@ let startTime = null;
 let lastActivatedCell = null;
 let lastActivationTime = 0;
 let isGameActive = false;
+let countdownTimerId = null;
 
 function isTouchDevice() {
   return navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
@@ -40,12 +43,16 @@ function resetToIdleState() {
   startTime = null;
   lastActivatedCell = null;
   lastActivationTime = 0;
+  clearCountdownTimer();
+  countdownText.classList.add('hidden');
+  countdownText.textContent = '';
   grid.innerHTML = '';
   grid.classList.add('hidden');
   resultText.classList.add('hidden');
   resultText.textContent = '';
   statusText.textContent = '尚未開始';
   startButton.textContent = '開始';
+  startButton.disabled = false;
 }
 
 function shuffle(numbers) {
@@ -71,7 +78,20 @@ function buildGrid() {
   });
 }
 
-function startGame() {
+function clearCountdownTimer() {
+  if (countdownTimerId !== null) {
+    window.clearTimeout(countdownTimerId);
+    countdownTimerId = null;
+  }
+}
+
+function showCountdown(secondsRemaining) {
+  countdownText.textContent = String(secondsRemaining);
+  countdownText.classList.remove('hidden');
+  grid.classList.add('hidden');
+}
+
+function beginActiveGame() {
   if (!canPlayGameOnThisDevice()) {
     showDesktopWarning();
     return;
@@ -84,11 +104,47 @@ function startGame() {
   lastActivationTime = 0;
 
   buildGrid();
+  countdownText.classList.add('hidden');
+  countdownText.textContent = '';
   resultText.classList.add('hidden');
   resultText.textContent = '';
   grid.classList.remove('hidden');
+  startButton.disabled = false;
   startButton.textContent = '重新開始';
   statusText.textContent = '請找：1';
+}
+
+function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
+  if (!canPlayGameOnThisDevice()) {
+    showDesktopWarning();
+    return;
+  }
+
+  clearCountdownTimer();
+  isGameActive = false;
+  expectedNumber = 1;
+  startTime = null;
+  lastActivatedCell = null;
+  lastActivationTime = 0;
+  resultText.classList.add('hidden');
+  resultText.textContent = '';
+  grid.innerHTML = '';
+  startButton.disabled = true;
+  startButton.textContent = '倒數中...';
+  statusText.textContent = `倒數 ${secondsRemaining} 秒`;
+  showCountdown(secondsRemaining);
+
+  if (secondsRemaining <= 1) {
+    countdownTimerId = window.setTimeout(() => {
+      countdownTimerId = null;
+      beginActiveGame();
+    }, 1000);
+    return;
+  }
+
+  countdownTimerId = window.setTimeout(() => {
+    startCountdown(secondsRemaining - 1);
+  }, 1000);
 }
 
 function finishGame() {
@@ -175,12 +231,16 @@ function handleGridInteraction(event) {
 }
 
 function handleStartButtonClick() {
-  if (isGameActive || !grid.classList.contains('hidden')) {
+  if (startButton.disabled) {
+    return;
+  }
+
+  if (isGameActive || !grid.classList.contains('hidden') || !countdownText.classList.contains('hidden')) {
     resetToIdleState();
     return;
   }
 
-  startGame();
+  startCountdown();
 }
 
 function preventTapZoom(event) {

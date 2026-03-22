@@ -56,6 +56,16 @@ h1 {
   font-weight: 600;
 }
 
+.countdown {
+  display: grid;
+  place-items: center;
+  min-height: 280px;
+  margin-bottom: 16px;
+  font-size: clamp(4rem, 18vw, 6rem);
+  font-weight: 800;
+  color: #2f63ff;
+}
+
 .grid {
   display: grid;
   touch-action: manipulation;
