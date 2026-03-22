@@ -1,9 +1,11 @@
 const startButton = document.getElementById('startButton');
 const statusText = document.getElementById('status');
+const countdownText = document.getElementById('countdown');
 const grid = document.getElementById('grid');
 const resultText = document.getElementById('result');
 
 const TOTAL = 25;
+const COUNTDOWN_SECONDS = 3;
 const SYNTHETIC_CLICK_GUARD_MS = 450;
 
 let expectedNumber = 1;
@@ -11,6 +13,8 @@ let startTime = null;
 let lastActivatedCell = null;
 let lastActivationTime = 0;
 let isGameActive = false;
+let countdownTimerId = null;
+let errorCount = 0;
 
 function isTouchDevice() {
   return navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
@@ -40,12 +44,17 @@ function resetToIdleState() {
   startTime = null;
   lastActivatedCell = null;
   lastActivationTime = 0;
+  errorCount = 0;
+  clearCountdownTimer();
+  countdownText.classList.add('hidden');
+  countdownText.textContent = '';
   grid.innerHTML = '';
   grid.classList.add('hidden');
   resultText.classList.add('hidden');
-  resultText.textContent = '';
+  resultText.innerHTML = '';
   statusText.textContent = '尚未開始';
   startButton.textContent = '開始';
+  startButton.disabled = false;
 }
 
 function shuffle(numbers) {
@@ -71,7 +80,20 @@ function buildGrid() {
   });
 }
 
-function startGame() {
+function clearCountdownTimer() {
+  if (countdownTimerId !== null) {
+    window.clearTimeout(countdownTimerId);
+    countdownTimerId = null;
+  }
+}
+
+function showCountdown(secondsRemaining) {
+  countdownText.textContent = String(secondsRemaining);
+  countdownText.classList.remove('hidden');
+  grid.classList.add('hidden');
+}
+
+function beginActiveGame() {
   if (!canPlayGameOnThisDevice()) {
     showDesktopWarning();
     return;
@@ -82,23 +104,80 @@ function startGame() {
   startTime = performance.now();
   lastActivatedCell = null;
   lastActivationTime = 0;
+  errorCount = 0;
 
   buildGrid();
+  countdownText.classList.add('hidden');
+  countdownText.textContent = '';
   resultText.classList.add('hidden');
-  resultText.textContent = '';
+  resultText.innerHTML = '';
   grid.classList.remove('hidden');
+  startButton.disabled = false;
   startButton.textContent = '重新開始';
   statusText.textContent = '請找：1';
+}
+
+function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
+  if (!canPlayGameOnThisDevice()) {
+    showDesktopWarning();
+    return;
+  }
+
+  clearCountdownTimer();
+  isGameActive = false;
+  expectedNumber = 1;
+  startTime = null;
+  lastActivatedCell = null;
+  lastActivationTime = 0;
+  errorCount = 0;
+  resultText.classList.add('hidden');
+  resultText.innerHTML = '';
+  grid.innerHTML = '';
+  startButton.disabled = true;
+  startButton.textContent = '倒數中...';
+  statusText.textContent = `倒數 ${secondsRemaining} 秒`;
+  showCountdown(secondsRemaining);
+
+  if (secondsRemaining <= 1) {
+    countdownTimerId = window.setTimeout(() => {
+      countdownTimerId = null;
+      beginActiveGame();
+    }, 1000);
+    return;
+  }
+
+  countdownTimerId = window.setTimeout(() => {
+    startCountdown(secondsRemaining - 1);
+  }, 1000);
 }
 
 function finishGame() {
   isGameActive = false;
   const elapsedMs = performance.now() - startTime;
-  const seconds = (elapsedMs / 1000).toFixed(2);
+  const elapsedText = formatElapsedTime(elapsedMs);
   statusText.textContent = '完成！';
-  resultText.textContent = `完成時間：${seconds} 秒`;
+  resultText.innerHTML = `
+    <h2 class="result-title">測驗完成</h2>
+    <ul class="result-list">
+      <li>花費時間：${elapsedText}</li>
+      <li>錯誤次數：${errorCount} 次</li>
+    </ul>
+  `;
   resultText.classList.remove('hidden');
   startButton.textContent = '開始';
+}
+
+function formatElapsedTime(elapsedMs) {
+  const totalSeconds = elapsedMs / 1000;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const secondsText = seconds.toFixed(2);
+
+  if (minutes === 0) {
+    return `${secondsText} 秒`;
+  }
+
+  return `${minutes} 分 ${secondsText} 秒`;
 }
 
 function activateCell(target) {
@@ -108,6 +187,7 @@ function activateCell(target) {
 
   const clickedValue = Number(target.dataset.value);
   if (clickedValue !== expectedNumber) {
+    errorCount += 1;
     return;
   }
 
@@ -147,6 +227,10 @@ function handleGridInteraction(event) {
   const isPointerDown = event.type === 'pointerdown';
   const isClick = event.type === 'click';
 
+  if (isPointerDown && 'pointerType' in event && event.pointerType === 'touch') {
+    return;
+  }
+
   let target = null;
 
   if (isTouchStart) {
@@ -175,12 +259,16 @@ function handleGridInteraction(event) {
 }
 
 function handleStartButtonClick() {
-  if (isGameActive || !grid.classList.contains('hidden')) {
+  if (startButton.disabled) {
+    return;
+  }
+
+  if (isGameActive || !grid.classList.contains('hidden') || !countdownText.classList.contains('hidden')) {
     resetToIdleState();
     return;
   }
 
-  startGame();
+  startCountdown();
 }
 
 function preventTapZoom(event) {

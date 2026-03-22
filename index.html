@@ -17,16 +17,61 @@
 <body>
   <main class="app">
     <h1>舒爾特方格（1~25）</h1>
-    <p class="note">依序點擊 1 到 25。點擊「開始」後才會顯示方格內容。</p>
+    <section class="note" aria-label="測驗說明與參考標準">
+      <p class="note-intro">依序點擊 1 到 25。點擊「開始」後，會先在畫面中央倒數 3 秒，倒數結束才會顯示方格內容。</p>
+
+      <div class="note-group">
+        <h2>一年級～二年級</h2>
+        <ul>
+          <li>45 秒內屬於優秀，代表視覺搜尋速度成熟、專注穩定。</li>
+          <li>46～70 秒為正常發展範圍。</li>
+          <li>71～100 秒表示搜尋策略仍在發展中。</li>
+          <li>超過 100 秒，建議持續練習並觀察是否容易分心或急躁。</li>
+        </ul>
+        <p class="note-highlight">低年級重點不是拼快，而是能否依序穩定完成、不跳號、不亂點。</p>
+      </div>
+
+      <div class="note-group">
+        <h2>三年級～四年級</h2>
+        <ul>
+          <li>35 秒內屬於優秀。</li>
+          <li>36～55 秒為穩定良好。</li>
+          <li>56～80 秒為一般水準。</li>
+          <li>超過 80 秒建議加強專注訓練。</li>
+        </ul>
+        <p class="note-highlight">這個階段會明顯分出三種型態：快但錯多（衝動型）、慢但穩定（保守型）、又快又穩（成熟型）；真正理想的是又快又穩。</p>
+      </div>
+
+      <div class="note-group">
+        <h2>五年級～六年級</h2>
+        <ul>
+          <li>30 秒內屬於優秀。</li>
+          <li>31～45 秒為穩定成熟。</li>
+          <li>46～65 秒為普通水準。</li>
+          <li>超過 65 秒建議加強專注持續力訓練。</li>
+          <li>若高年級超過 80 秒，或錯誤超過 5 次，建議納入專注力觀察。</li>
+        </ul>
+      </div>
+
+      <div class="note-group note-group--errors">
+        <h2>錯誤次數同樣重要</h2>
+        <ul>
+          <li>0～1 次代表穩定。</li>
+          <li>2～4 次表示容易急躁。</li>
+          <li>5 次以上代表衝動控制需要加強。</li>
+        </ul>
+      </div>
+    </section>
 
     <div class="controls">
       <button id="startButton" class="start-button" type="button">開始</button>
       <span id="status" class="status">尚未開始</span>
     </div>
 
+    <div id="countdown" class="countdown hidden" aria-live="assertive"></div>
     <div id="grid" class="grid hidden" aria-live="polite"></div>
 
-    <p id="result" class="result hidden" aria-live="polite"></p>
+    <section id="result" class="result hidden" aria-live="polite"></section>
   </main>
 
   <script src="script.js"></script>
