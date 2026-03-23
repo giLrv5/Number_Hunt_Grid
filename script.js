@@ -17,6 +17,7 @@ const langEnButton = document.getElementById('langEnButton');
 const TOTAL = 25;
 const COUNTDOWN_SECONDS = 3;
 const SYNTHETIC_CLICK_GUARD_MS = 450;
+const TAP_INTERACTION_GUARD_MS = 450;
 
 const I18N = {
   zh: {
@@ -160,6 +161,7 @@ let errorCount = 0;
 let isOnStartScreen = true;
 let lastResult = null;
 let lastLanguageInteractionTime = 0;
+let lastButtonInteraction = { key: '', time: 0 };
 
 function getText() {
   return I18N[currentLanguage];
@@ -169,15 +171,16 @@ function isTouchDevice() {
   return navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
 }
 
-function isMobileOrTablet() {
-  const userAgent = navigator.userAgent.toLowerCase();
-  const isMobile = /android|webos|iphone|ipod|blackberry|iemobile|opera mini/.test(userAgent);
-  const isTablet = /ipad|tablet|playbook|silk|kindle/.test(userAgent);
-  return isMobile || isTablet;
+function hasCoarsePointer() {
+  return window.matchMedia('(any-pointer: coarse)').matches || window.matchMedia('(pointer: coarse)').matches;
+}
+
+function hasCompactViewport() {
+  return Math.min(window.innerWidth, window.innerHeight) <= 1024;
 }
 
 function canPlayGameOnThisDevice() {
-  return isTouchDevice() && isMobileOrTablet();
+  return isTouchDevice() || hasCoarsePointer() || hasCompactViewport();
 }
 
 function updateLanguageButtons() {
@@ -290,6 +293,35 @@ function shouldSkipDuplicateLanguageInteraction() {
   const isDuplicate = now - lastLanguageInteractionTime < 400;
   lastLanguageInteractionTime = now;
   return isDuplicate;
+}
+
+function shouldSkipDuplicateButtonInteraction(interactionKey) {
+  const now = performance.now();
+  const isDuplicate = lastButtonInteraction.key === interactionKey && now - lastButtonInteraction.time < TAP_INTERACTION_GUARD_MS;
+  lastButtonInteraction = { key: interactionKey, time: now };
+  return isDuplicate;
+}
+
+function bindTapInteraction(element, interactionKey, handler) {
+  const handleInteraction = (event) => {
+    if (event.type === 'pointerup' && 'pointerType' in event && event.pointerType === 'mouse') {
+      return;
+    }
+
+    if (shouldSkipDuplicateButtonInteraction(interactionKey)) {
+      return;
+    }
+
+    if (event.cancelable) {
+      event.preventDefault();
+    }
+
+    handler(event);
+  };
+
+  element.addEventListener('pointerup', handleInteraction);
+  element.addEventListener('touchend', handleInteraction, { passive: false });
+  element.addEventListener('click', handleInteraction);
 }
 
 function handleLanguageSwitch(language, event) {
@@ -755,14 +787,10 @@ grid.addEventListener('click', handleGridInteraction);
 document.addEventListener('touchmove', preventTouchScroll, { passive: false });
 document.addEventListener('dblclick', preventTapZoom, { passive: false });
 document.addEventListener('gesturestart', preventTapZoom, { passive: false });
-startButton.addEventListener('click', handleStartButtonClick);
-heroStartButton.addEventListener('click', handleHeroStartButtonClick);
-langZhButton.addEventListener('pointerup', (event) => handleLanguageSwitch('zh', event));
-langEnButton.addEventListener('pointerup', (event) => handleLanguageSwitch('en', event));
-langZhButton.addEventListener('touchend', (event) => handleLanguageSwitch('zh', event), { passive: false });
-langEnButton.addEventListener('touchend', (event) => handleLanguageSwitch('en', event), { passive: false });
-langZhButton.addEventListener('click', (event) => handleLanguageSwitch('zh', event));
-langEnButton.addEventListener('click', (event) => handleLanguageSwitch('en', event));
+bindTapInteraction(startButton, 'start-button', handleStartButtonClick);
+bindTapInteraction(heroStartButton, 'hero-start-button', handleHeroStartButtonClick);
+bindTapInteraction(langZhButton, 'lang-zh', (event) => handleLanguageSwitch('zh', event));
+bindTapInteraction(langEnButton, 'lang-en', (event) => handleLanguageSwitch('en', event));
 
 if (!canPlayGameOnThisDevice()) {
   showDesktopWarning();
