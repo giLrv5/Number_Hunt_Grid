@@ -203,7 +203,7 @@ function finishGame() {
   statusText.textContent = '完成！';
   grid.classList.add('hidden');
   resultText.innerHTML = `
-    <h2 class="result-title">測驗完成</h2>
+    <h2 class="result-title">完成了，做得很好！</h2>
     <div class="result-metrics">
       <div class="result-card">
         <span class="result-card-label">花費時間</span>
