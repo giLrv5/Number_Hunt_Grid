@@ -159,7 +159,10 @@ let countdownTimerId = null;
 let errorCount = 0;
 let isOnStartScreen = true;
 let lastResult = null;
+<<<<<<< codex/add-english-language-toggle-to-webpage-9xtcrm
 let lastLanguageInteractionTime = 0;
+=======
+>>>>>>> main
 
 function getText() {
   return I18N[currentLanguage];
@@ -285,6 +288,7 @@ function setLanguage(language) {
   updateStaticTexts();
 }
 
+<<<<<<< codex/add-english-language-toggle-to-webpage-9xtcrm
 function shouldSkipDuplicateLanguageInteraction() {
   const now = performance.now();
   const isDuplicate = now - lastLanguageInteractionTime < 400;
@@ -304,6 +308,8 @@ function handleLanguageSwitch(language, event) {
   setLanguage(language);
 }
 
+=======
+>>>>>>> main
 function showDesktopWarning() {
   startButton.disabled = true;
   heroStartButton.disabled = true;
@@ -758,12 +764,17 @@ document.addEventListener('dblclick', preventTapZoom, { passive: false });
 document.addEventListener('gesturestart', preventTapZoom, { passive: false });
 startButton.addEventListener('click', handleStartButtonClick);
 heroStartButton.addEventListener('click', handleHeroStartButtonClick);
+<<<<<<< codex/add-english-language-toggle-to-webpage-9xtcrm
 langZhButton.addEventListener('pointerup', (event) => handleLanguageSwitch('zh', event));
 langEnButton.addEventListener('pointerup', (event) => handleLanguageSwitch('en', event));
 langZhButton.addEventListener('touchend', (event) => handleLanguageSwitch('zh', event), { passive: false });
 langEnButton.addEventListener('touchend', (event) => handleLanguageSwitch('en', event), { passive: false });
 langZhButton.addEventListener('click', (event) => handleLanguageSwitch('zh', event));
 langEnButton.addEventListener('click', (event) => handleLanguageSwitch('en', event));
+=======
+langZhButton.addEventListener('click', () => setLanguage('zh'));
+langEnButton.addEventListener('click', () => setLanguage('en'));
+>>>>>>> main
 
 if (!canPlayGameOnThisDevice()) {
   showDesktopWarning();
