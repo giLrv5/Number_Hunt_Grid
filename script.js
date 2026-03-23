@@ -499,6 +499,14 @@ function handleStartButtonClick() {
   startCountdown();
 }
 
+function handleHeroStartButtonClick() {
+  if (heroStartButton.disabled) {
+    return;
+  }
+
+  startCountdown();
+}
+
 function preventTapZoom(event) {
   event.preventDefault();
 }
@@ -537,4 +545,4 @@ if (!canPlayGameOnThisDevice()) {
 }
 
 startButton.addEventListener('click', handleStartButtonClick);
-heroStartButton.addEventListener('click', startCountdown);
+heroStartButton.addEventListener('click', handleHeroStartButtonClick);
