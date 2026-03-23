@@ -30,7 +30,7 @@ body {
 body {
   display: grid;
   place-items: center;
-  padding: 16px;
+  padding: clamp(8px, 2.6vw, 16px);
   background:
     radial-gradient(circle at top, rgba(160, 200, 255, 0.42), transparent 34%),
     linear-gradient(180deg, #eff5ff 0%, #eaf2ff 45%, #f6f9ff 100%);
@@ -43,9 +43,10 @@ body.interaction-locked {
 }
 
 .app {
-  width: min(100%, 560px);
+  width: 100%;
+  max-width: 560px;
   max-height: 100dvh;
-  padding: 24px 24px 28px;
+  padding: clamp(14px, 3.8vw, 24px);
   border-radius: 24px;
   border: 1px solid rgba(191, 215, 255, 0.9);
   background: rgba(255, 255, 255, 0.94);
@@ -121,7 +122,7 @@ h1 {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: clamp(8px, 2.4vw, 12px);
   margin-bottom: 16px;
 }
 
@@ -177,17 +178,18 @@ h1 {
   width: 100%;
   touch-action: manipulation;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
+  gap: clamp(6px, 1.9vw, 10px);
 }
 
 .cell {
   aspect-ratio: 1;
   color: var(--ink-900);
   border: 1px solid var(--blue-200);
-  border-radius: 18px;
+  border-radius: clamp(12px, 3.4vw, 18px);
   display: grid;
   place-items: center;
-  font-size: clamp(1.15rem, 4vw, 1.45rem);
+  min-width: 0;
+  font-size: clamp(0.96rem, 4vw, 1.45rem);
   font-weight: 700;
   background: linear-gradient(180deg, #ffffff 0%, #f6faff 100%);
   box-shadow: 0 8px 16px rgba(67, 104, 184, 0.1);
@@ -298,7 +300,62 @@ h1 {
 }
 
 @media (max-width: 520px) {
+  .app {
+    border-radius: 20px;
+  }
+
+  .brand {
+    font-size: 0.88rem;
+  }
+
+  h1 {
+    font-size: clamp(1.35rem, 7vw, 1.7rem);
+  }
+
+  .intro {
+    padding: 12px 14px;
+  }
+
+  .start-button,
+  .status {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .status {
+    min-width: 0;
+  }
+
   .result-metrics {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  body {
+    padding: 8px;
+  }
+
+  .app {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .controls {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .countdown {
+    min-height: 220px;
+  }
+
+  .grid {
+    gap: 6px;
+  }
+
+  .cell {
+    font-size: clamp(0.92rem, 3.8vw, 1.08rem);
+    border-radius: 12px;
   }
 }
