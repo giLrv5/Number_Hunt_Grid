@@ -3,6 +3,7 @@ const statusText = document.getElementById('status');
 const countdownText = document.getElementById('countdown');
 const grid = document.getElementById('grid');
 const resultText = document.getElementById('result');
+const app = document.querySelector('.app');
 
 const TOTAL = 25;
 const COUNTDOWN_SECONDS = 3;
@@ -97,6 +98,7 @@ function resetToIdleState() {
   startButton.textContent = '開始';
   startButton.disabled = false;
   updateInteractionLock(false);
+  scrollAppToTop();
 }
 
 function shuffle(numbers) {
@@ -158,6 +160,7 @@ function beginActiveGame() {
   startButton.textContent = '重新開始';
   statusText.textContent = '請找：1';
   updateInteractionLock(true);
+  scrollAppToTop();
 }
 
 function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
@@ -220,6 +223,7 @@ function finishGame() {
     </div>
   `;
   resultText.classList.remove('hidden');
+  scrollAppToTop();
   resultText.scrollIntoView({ block: 'start', behavior: 'smooth' });
   startButton.textContent = '開始';
   updateInteractionLock(false);
@@ -392,6 +396,12 @@ function updateInteractionLock(shouldLock) {
 function preventTouchScroll(event) {
   if (isInteractionLocked()) {
     event.preventDefault();
+  }
+}
+
+function scrollAppToTop() {
+  if (app instanceof HTMLElement) {
+    app.scrollTo({ top: 0, behavior: 'auto' });
   }
 }
 
