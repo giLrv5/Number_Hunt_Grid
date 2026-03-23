@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  font-family: "Noto Sans TC", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --blue-050: #f4f8ff;
   --blue-100: #e8f0ff;
   --blue-200: #d7e6ff;
@@ -44,7 +44,7 @@ body.interaction-locked {
 
 .app {
   width: 100%;
-  max-width: 560px;
+  max-width: 640px;
   max-height: 100dvh;
   padding: clamp(14px, 3.8vw, 24px);
   border-radius: 24px;
@@ -53,6 +53,19 @@ body.interaction-locked {
   box-shadow: 0 18px 40px rgba(55, 94, 170, 0.16);
   overflow: auto;
   backdrop-filter: blur(8px);
+}
+
+.app-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.heading-group {
+  min-width: 0;
+  flex: 1;
 }
 
 .brand {
@@ -64,9 +77,38 @@ body.interaction-locked {
 }
 
 h1 {
-  margin: 0 0 10px;
+  margin: 0;
   font-size: clamp(1.6rem, 4vw, 1.95rem);
+  line-height: 1.2;
   color: var(--blue-700);
+}
+
+.language-switcher {
+  display: inline-flex;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--blue-050);
+  border: 1px solid var(--line-soft);
+}
+
+.language-button {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink-700);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.language-button.is-active {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--blue-500) 0%, var(--blue-600) 100%);
+  box-shadow: 0 8px 16px rgba(47, 99, 255, 0.22);
 }
 
 .intro {
@@ -85,12 +127,6 @@ h1 {
   border-top: 1px solid #dbe4f5;
 }
 
-.note-group h2 {
-  margin: 0 0 8px;
-  font-size: 1rem;
-  color: var(--ink-900);
-}
-
 .note-group h4 {
   margin: 0 0 8px;
   font-size: 1rem;
@@ -106,7 +142,6 @@ h1 {
   margin-top: 6px;
 }
 
-.note-highlight,
 .note-highlight-text {
   margin: 12px 0 0;
   line-height: 1.6;
@@ -114,7 +149,7 @@ h1 {
   color: #36507d;
 }
 
-.note-group--errors h2 {
+.note-group--errors h4 {
   color: #1844c6;
 }
 
@@ -150,7 +185,7 @@ h1 {
 
 .start-screen-text {
   margin: 0;
-  max-width: 24ch;
+  max-width: 34ch;
   line-height: 1.7;
   color: var(--ink-700);
 }
@@ -207,11 +242,13 @@ h1 {
 }
 
 .status {
+  max-width: 100%;
   padding: 8px 14px;
   border-radius: 999px;
   background: var(--blue-050);
   border: 1px solid var(--line-soft);
   font-weight: 600;
+  line-height: 1.4;
   color: var(--blue-700);
 }
 
@@ -356,6 +393,17 @@ h1 {
   list-style-position: inside;
 }
 
+@media (max-width: 600px) {
+  .app-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .language-switcher {
+    align-self: flex-start;
+  }
+}
+
 @media (max-width: 520px) {
   .app {
     border-radius: 20px;
@@ -377,10 +425,6 @@ h1 {
   .status {
     width: fit-content;
     max-width: 100%;
-  }
-
-  .status {
-    min-width: 0;
   }
 
   .result-metrics {
