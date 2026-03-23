@@ -1,4 +1,6 @@
 const startButton = document.getElementById('startButton');
+const heroStartButton = document.getElementById('heroStartButton');
+const startScreen = document.getElementById('startScreen');
 const statusText = document.getElementById('status');
 const countdownText = document.getElementById('countdown');
 const grid = document.getElementById('grid');
@@ -56,6 +58,7 @@ let lastActivationTime = 0;
 let isGameActive = false;
 let countdownTimerId = null;
 let errorCount = 0;
+let isOnStartScreen = true;
 
 function isTouchDevice() {
   return navigator.maxTouchPoints > 0 || 'ontouchstart' in window;
@@ -74,14 +77,108 @@ function canPlayGameOnThisDevice() {
 
 function showDesktopWarning() {
   startButton.disabled = true;
+  heroStartButton.disabled = true;
   statusText.textContent = '此遊戲僅限「可觸控」的手機或平板裝置使用。請改用手機/平板開啟。';
+  startScreen.classList.remove('hidden');
   grid.classList.add('hidden');
   resultText.classList.add('hidden');
   updateInteractionLock(false);
 }
 
+function getNeighborIndexes(index) {
+  const row = Math.floor(index / 5);
+  const col = index % 5;
+  const neighbors = [];
+
+  for (let rowOffset = -1; rowOffset <= 1; rowOffset += 1) {
+    for (let colOffset = -1; colOffset <= 1; colOffset += 1) {
+      if (rowOffset === 0 && colOffset === 0) {
+        continue;
+      }
+
+      const nextRow = row + rowOffset;
+      const nextCol = col + colOffset;
+
+      if (nextRow < 0 || nextRow >= 5 || nextCol < 0 || nextCol >= 5) {
+        continue;
+      }
+
+      neighbors.push(nextRow * 5 + nextCol);
+    }
+  }
+
+  return neighbors;
+}
+
+function scoreBoard(values) {
+  let score = 0;
+
+  values.forEach((value, index) => {
+    const neighbors = getNeighborIndexes(index);
+
+    neighbors.forEach((neighborIndex) => {
+      if (neighborIndex <= index) {
+        return;
+      }
+
+      const diff = Math.abs(value - values[neighborIndex]);
+
+      if (diff === 1) {
+        score += 12;
+      } else if (diff === 2) {
+        score += 6;
+      } else if (diff <= 4) {
+        score += 2;
+      }
+    });
+  });
+
+  return score;
+}
+
+function buildDistributedValues() {
+  const source = Array.from({ length: TOTAL }, (_, i) => i + 1);
+  let bestValues = source;
+  let bestScore = Number.POSITIVE_INFINITY;
+
+  for (let attempt = 0; attempt < 240; attempt += 1) {
+    const candidate = shuffle(source);
+    let candidateScore = scoreBoard(candidate);
+
+    for (let swapAttempt = 0; swapAttempt < 80 && candidateScore > 0; swapAttempt += 1) {
+      const firstIndex = Math.floor(Math.random() * candidate.length);
+      let secondIndex = Math.floor(Math.random() * candidate.length);
+
+      while (secondIndex === firstIndex) {
+        secondIndex = Math.floor(Math.random() * candidate.length);
+      }
+
+      [candidate[firstIndex], candidate[secondIndex]] = [candidate[secondIndex], candidate[firstIndex]];
+      const swappedScore = scoreBoard(candidate);
+
+      if (swappedScore <= candidateScore) {
+        candidateScore = swappedScore;
+      } else {
+        [candidate[firstIndex], candidate[secondIndex]] = [candidate[secondIndex], candidate[firstIndex]];
+      }
+    }
+
+    if (candidateScore < bestScore) {
+      bestValues = [...candidate];
+      bestScore = candidateScore;
+    }
+
+    if (candidateScore === 0) {
+      break;
+    }
+  }
+
+  return bestValues;
+}
+
 function resetToIdleState() {
   isGameActive = false;
+  isOnStartScreen = true;
   expectedNumber = 1;
   startTime = null;
   lastActivatedCell = null;
@@ -94,9 +191,13 @@ function resetToIdleState() {
   grid.classList.add('hidden');
   resultText.classList.add('hidden');
   resultText.innerHTML = '';
+  startScreen.classList.remove('hidden');
+  startButton.classList.add('hidden');
+  statusText.classList.add('hidden');
   statusText.textContent = '尚未開始';
   startButton.textContent = '開始';
   startButton.disabled = false;
+  heroStartButton.disabled = false;
   updateInteractionLock(false);
   scrollAppToTop();
 }
@@ -112,7 +213,7 @@ function shuffle(numbers) {
 
 function buildGrid() {
   grid.innerHTML = '';
-  const values = shuffle(Array.from({ length: TOTAL }, (_, i) => i + 1));
+  const values = buildDistributedValues();
 
   values.forEach((value) => {
     const cell = document.createElement('button');
@@ -144,6 +245,7 @@ function beginActiveGame() {
   }
 
   isGameActive = true;
+  isOnStartScreen = false;
   expectedNumber = 1;
   startTime = performance.now();
   lastActivatedCell = null;
@@ -151,12 +253,16 @@ function beginActiveGame() {
   errorCount = 0;
 
   buildGrid();
+  startScreen.classList.add('hidden');
   countdownText.classList.add('hidden');
   countdownText.textContent = '';
   resultText.classList.add('hidden');
   resultText.innerHTML = '';
+  startButton.classList.remove('hidden');
+  statusText.classList.remove('hidden');
   grid.classList.remove('hidden');
   startButton.disabled = false;
+  heroStartButton.disabled = false;
   startButton.textContent = '重新開始';
   statusText.textContent = '請找：1';
   updateInteractionLock(true);
@@ -171,15 +277,20 @@ function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
 
   clearCountdownTimer();
   isGameActive = false;
+  isOnStartScreen = false;
   expectedNumber = 1;
   startTime = null;
   lastActivatedCell = null;
   lastActivationTime = 0;
   errorCount = 0;
+  startScreen.classList.add('hidden');
   resultText.classList.add('hidden');
   resultText.innerHTML = '';
   grid.innerHTML = '';
+  startButton.classList.remove('hidden');
+  statusText.classList.remove('hidden');
   startButton.disabled = true;
+  heroStartButton.disabled = true;
   startButton.textContent = '倒數中...';
   statusText.textContent = `倒數 ${secondsRemaining} 秒`;
   showCountdown(secondsRemaining);
@@ -225,7 +336,9 @@ function finishGame() {
   resultText.classList.remove('hidden');
   scrollAppToTop();
   resultText.scrollIntoView({ block: 'start', behavior: 'smooth' });
-  startButton.textContent = '開始';
+  startButton.textContent = '重新開始';
+  startButton.disabled = false;
+  heroStartButton.disabled = false;
   updateInteractionLock(false);
 }
 
@@ -373,7 +486,12 @@ function handleStartButtonClick() {
     return;
   }
 
-  if (isGameActive || !grid.classList.contains('hidden') || !countdownText.classList.contains('hidden')) {
+  if (isOnStartScreen) {
+    startCountdown();
+    return;
+  }
+
+  if (isGameActive || !grid.classList.contains('hidden') || !countdownText.classList.contains('hidden') || !resultText.classList.contains('hidden')) {
     resetToIdleState();
     return;
   }
@@ -419,3 +537,4 @@ if (!canPlayGameOnThisDevice()) {
 }
 
 startButton.addEventListener('click', handleStartButtonClick);
+heroStartButton.addEventListener('click', startCountdown);
