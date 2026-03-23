@@ -102,6 +102,9 @@ h1 {
   color: var(--ink-700);
   background: transparent;
   cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
 
