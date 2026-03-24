@@ -183,19 +183,18 @@ h1 {
 
 .controls {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   margin-bottom: 16px;
 }
 
 .start-button {
   border: none;
-  border-radius: 50%;
-  width: clamp(92px, 24vw, 108px);
-  height: clamp(92px, 24vw, 108px);
-  display: grid;
-  place-items: center;
-  margin-inline: auto;
-  padding: 0;
+  border-radius: 14px;
+  min-height: 48px;
+  padding: 10px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   font-size: 1rem;
   line-height: 1.2;
@@ -207,6 +206,14 @@ h1 {
   -webkit-tap-highlight-color: transparent;
   box-shadow: 0 12px 22px rgba(47, 99, 255, 0.24);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.start-button--hero {
+  border-radius: 50%;
+  width: clamp(92px, 24vw, 108px);
+  height: clamp(92px, 24vw, 108px);
+  padding: 0;
+  margin-inline: auto;
 }
 
 .start-button:active {

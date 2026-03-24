@@ -527,7 +527,7 @@ function beginActiveGame() {
   startButton.textContent = getText().restart;
   updateStatusText();
   updateInteractionLock(true);
-  scrollAppToTop();
+  window.requestAnimationFrame(centerGameAreaInView);
 }
 
 function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
@@ -785,6 +785,15 @@ function scrollAppToTop() {
   if (app instanceof HTMLElement) {
     app.scrollTo({ top: 0, behavior: 'auto' });
   }
+}
+
+function centerGameAreaInView() {
+  if (!(app instanceof HTMLElement) || !(grid instanceof HTMLElement)) {
+    return;
+  }
+
+  const targetTop = grid.offsetTop - Math.max((app.clientHeight - grid.clientHeight) / 2, 0);
+  app.scrollTo({ top: Math.max(targetTop, 0), behavior: 'smooth' });
 }
 
 grid.addEventListener('touchstart', handleGridInteraction, { passive: false });
