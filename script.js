@@ -163,6 +163,7 @@ let isOnStartScreen = true;
 let lastResult = null;
 let lastLanguageInteractionTime = 0;
 let lastButtonInteraction = { key: '', time: 0 };
+let isDeviceHintVisible = false;
 
 function getText() {
   return I18N[currentLanguage];
@@ -186,6 +187,11 @@ function canPlayGameOnThisDevice() {
 
 function isLikelyNonTouchDevice() {
   return !canPlayGameOnThisDevice();
+}
+
+function updateDeviceHintVisibility(shouldShow) {
+  isDeviceHintVisible = shouldShow && isLikelyNonTouchDevice();
+  deviceHintText.classList.toggle('hidden', !isDeviceHintVisible);
 }
 
 function updateLanguageButtons() {
@@ -259,7 +265,7 @@ function updateStaticTexts() {
   pageTitle.textContent = text.pageTitle;
   introText.textContent = text.intro;
   deviceHintText.textContent = text.nonTouchHint;
-  deviceHintText.classList.toggle('hidden', !isLikelyNonTouchDevice());
+  updateDeviceHintVisibility(isDeviceHintVisible);
   startScreenTitle.textContent = text.startScreenTitle;
   startScreenText.textContent = text.startScreenText;
   heroStartButton.textContent = text.start;
@@ -336,6 +342,21 @@ function handleLanguageSwitch(language, event) {
   }
 
   setLanguage(language);
+}
+
+function bindStartButtonHoverHint(element) {
+  const showHint = () => {
+    updateDeviceHintVisibility(true);
+  };
+
+  const hideHint = () => {
+    updateDeviceHintVisibility(false);
+  };
+
+  element.addEventListener('mouseenter', showHint);
+  element.addEventListener('mousemove', showHint);
+  element.addEventListener('mouseleave', hideHint);
+  element.addEventListener('blur', hideHint);
 }
 
 function getNeighborIndexes(index) {
@@ -450,6 +471,7 @@ function resetToIdleState() {
   statusText.classList.add('hidden');
   startButton.disabled = false;
   heroStartButton.disabled = false;
+  updateDeviceHintVisibility(false);
   updateInteractionLock(false);
   updateStaticTexts();
   scrollAppToTop();
@@ -513,6 +535,7 @@ function beginActiveGame() {
   grid.classList.remove('hidden');
   startButton.disabled = false;
   heroStartButton.disabled = false;
+  updateDeviceHintVisibility(false);
   startButton.textContent = getText().restart;
   updateStatusText();
   updateInteractionLock(true);
@@ -537,6 +560,7 @@ function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
   statusText.classList.remove('hidden');
   startButton.disabled = true;
   heroStartButton.disabled = true;
+  updateDeviceHintVisibility(false);
   startButton.textContent = getText().counting;
   showCountdown(secondsRemaining);
   updateInteractionLock(true);
@@ -774,5 +798,7 @@ bindTapInteraction(startButton, 'start-button', handleStartButtonClick);
 bindTapInteraction(heroStartButton, 'hero-start-button', handleHeroStartButtonClick);
 bindTapInteraction(langZhButton, 'lang-zh', (event) => handleLanguageSwitch('zh', event));
 bindTapInteraction(langEnButton, 'lang-en', (event) => handleLanguageSwitch('en', event));
+bindStartButtonHoverHint(startButton);
+bindStartButtonHoverHint(heroStartButton);
 
 resetToIdleState();
