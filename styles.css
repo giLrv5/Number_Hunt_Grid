@@ -55,19 +55,6 @@ body.interaction-locked {
   backdrop-filter: blur(8px);
 }
 
-.app-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 10px;
-}
-
-.heading-group {
-  min-width: 0;
-  flex: 1;
-}
-
 .brand {
   margin: 0 0 8px;
   font-size: 0.98rem;
@@ -77,7 +64,7 @@ body.interaction-locked {
 }
 
 h1 {
-  margin: 0;
+  margin: 0 0 10px;
   font-size: clamp(1.6rem, 4vw, 1.95rem);
   line-height: 1.2;
   color: var(--blue-700);
@@ -171,67 +158,8 @@ h1 {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: clamp(8px, 2.4vw, 12px);
+  gap: 12px;
   margin-bottom: 16px;
-}
-
-.start-screen {
-  display: grid;
-  place-items: center;
-  gap: 14px;
-  min-height: min(52dvh, 420px);
-  margin: 0 0 18px;
-  padding: clamp(20px, 6vw, 32px);
-  border-radius: 24px;
-  border: 1px solid var(--line-soft);
-  background:
-    radial-gradient(circle at top, rgba(139, 184, 255, 0.26), transparent 48%),
-    linear-gradient(180deg, #f7fbff 0%, #eef4ff 100%);
-  text-align: center;
-}
-
-.start-screen-title {
-  margin: 0;
-  font-size: clamp(1.2rem, 4.6vw, 1.6rem);
-  font-weight: 800;
-  color: var(--blue-700);
-}
-
-.start-screen-text {
-  margin: 0;
-  max-width: 34ch;
-  line-height: 1.7;
-  color: var(--ink-700);
-}
-
-.hero-start-button {
-  min-width: min(100%, 240px);
-  min-height: 240px;
-  border: none;
-  border-radius: 999px;
-  padding: 24px;
-  font-size: clamp(1.9rem, 8vw, 2.5rem);
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  color: #ffffff;
-  background: linear-gradient(135deg, #77a7ff 0%, var(--blue-600) 100%);
-  box-shadow:
-    0 24px 40px rgba(47, 99, 255, 0.24),
-    inset 0 2px 10px rgba(255, 255, 255, 0.18);
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.hero-start-button:active {
-  transform: scale(0.98);
-}
-
-.hero-start-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
-  box-shadow: none;
 }
 
 .start-button {
@@ -447,45 +375,5 @@ h1 {
 
   .result-metrics {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 420px) {
-  body {
-    padding: 8px;
-  }
-
-  .app {
-    padding: 12px;
-    border-radius: 18px;
-  }
-
-  .controls {
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-
-  .countdown {
-    min-height: 220px;
-  }
-
-  .start-screen {
-    min-height: 46dvh;
-    padding: 18px 16px;
-  }
-
-  .hero-start-button {
-    min-width: min(100%, 220px);
-    min-height: 220px;
-    font-size: clamp(1.7rem, 10vw, 2.15rem);
-  }
-
-  .grid {
-    gap: 6px;
-  }
-
-  .cell {
-    font-size: clamp(0.92rem, 3.8vw, 1.08rem);
-    border-radius: 12px;
   }
 }
