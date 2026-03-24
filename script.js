@@ -9,6 +9,7 @@ const app = document.querySelector('.app');
 const brandText = document.getElementById('brand');
 const pageTitle = document.getElementById('pageTitle');
 const introText = document.getElementById('intro');
+const deviceHintText = document.getElementById('deviceHint');
 const startScreenTitle = document.getElementById('startScreenTitle');
 const startScreenText = document.getElementById('startScreenText');
 const langZhButton = document.getElementById('langZhButton');
@@ -35,7 +36,7 @@ const I18N = {
     countdownStatus: (seconds) => `倒數 ${seconds} 秒`,
     findNumber: (value) => `請找：${value}`,
     completed: '完成！',
-    desktopWarning: '此遊戲僅限「可觸控」的手機或平板裝置使用。請改用手機／平板開啟。',
+    nonTouchHint: '偵測到目前裝置可能不是觸碰裝置；仍可繼續進行測驗，建議改用觸控操作以獲得較佳體驗。',
     resultTitle: '完成了，做得很好！',
     elapsedLabel: '花費時間',
     errorLabel: '錯誤次數',
@@ -99,7 +100,7 @@ const I18N = {
     countdownStatus: (seconds) => `Countdown: ${seconds}s`,
     findNumber: (value) => `Find: ${value}`,
     completed: 'Finished!',
-    desktopWarning: 'This activity is designed for touch-enabled phones or tablets. Please open it on a mobile or tablet device.',
+    nonTouchHint: 'A non-touch device was detected. You can still continue the activity, but touch input is recommended for the best experience.',
     resultTitle: 'Great job — you finished!',
     elapsedLabel: 'Time used',
     errorLabel: 'Errors',
@@ -183,6 +184,10 @@ function canPlayGameOnThisDevice() {
   return isTouchDevice() || hasCoarsePointer() || hasCompactViewport();
 }
 
+function isLikelyNonTouchDevice() {
+  return !canPlayGameOnThisDevice();
+}
+
 function updateLanguageButtons() {
   const isZh = currentLanguage === 'zh';
   langZhButton.classList.toggle('is-active', isZh);
@@ -193,11 +198,6 @@ function updateLanguageButtons() {
 
 function updateStatusText() {
   const text = getText();
-
-  if (!canPlayGameOnThisDevice()) {
-    statusText.textContent = text.desktopWarning;
-    return;
-  }
 
   if (isGameActive) {
     statusText.textContent = text.findNumber(expectedNumber);
@@ -258,6 +258,8 @@ function updateStaticTexts() {
   brandText.textContent = text.brand;
   pageTitle.textContent = text.pageTitle;
   introText.textContent = text.intro;
+  deviceHintText.textContent = text.nonTouchHint;
+  deviceHintText.classList.toggle('hidden', !isLikelyNonTouchDevice());
   startScreenTitle.textContent = text.startScreenTitle;
   startScreenText.textContent = text.startScreenText;
   heroStartButton.textContent = text.start;
@@ -334,15 +336,6 @@ function handleLanguageSwitch(language, event) {
   }
 
   setLanguage(language);
-}
-function showDesktopWarning() {
-  startButton.disabled = true;
-  heroStartButton.disabled = true;
-  startScreen.classList.remove('hidden');
-  grid.classList.add('hidden');
-  resultText.classList.add('hidden');
-  updateInteractionLock(false);
-  updateStaticTexts();
 }
 
 function getNeighborIndexes(index) {
@@ -500,11 +493,6 @@ function showCountdown(secondsRemaining) {
 }
 
 function beginActiveGame() {
-  if (!canPlayGameOnThisDevice()) {
-    showDesktopWarning();
-    return;
-  }
-
   isGameActive = true;
   isOnStartScreen = false;
   expectedNumber = 1;
@@ -532,11 +520,6 @@ function beginActiveGame() {
 }
 
 function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
-  if (!canPlayGameOnThisDevice()) {
-    showDesktopWarning();
-    return;
-  }
-
   clearCountdownTimer();
   isGameActive = false;
   isOnStartScreen = false;
@@ -792,8 +775,4 @@ bindTapInteraction(heroStartButton, 'hero-start-button', handleHeroStartButtonCl
 bindTapInteraction(langZhButton, 'lang-zh', (event) => handleLanguageSwitch('zh', event));
 bindTapInteraction(langEnButton, 'lang-en', (event) => handleLanguageSwitch('en', event));
 
-if (!canPlayGameOnThisDevice()) {
-  showDesktopWarning();
-} else {
-  resetToIdleState();
-}
+resetToIdleState();
