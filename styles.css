@@ -194,6 +194,7 @@ h1 {
   height: clamp(92px, 24vw, 108px);
   display: grid;
   place-items: center;
+  margin-inline: auto;
   padding: 0;
   text-align: center;
   font-size: 1rem;
