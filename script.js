@@ -165,6 +165,14 @@ let lastLanguageInteractionTime = 0;
 let lastButtonInteraction = { key: '', time: 0 };
 let isDeviceHintVisible = false;
 
+function trackAnalyticsEvent(eventName, params = {}) {
+  if (typeof window.gtag !== 'function') {
+    return;
+  }
+
+  window.gtag('event', eventName, params);
+}
+
 function getText() {
   return I18N[currentLanguage];
 }
@@ -294,6 +302,9 @@ function setLanguage(language) {
 
   currentLanguage = language;
   updateStaticTexts();
+  trackAnalyticsEvent('language_switch', {
+    language: currentLanguage,
+  });
 }
 
 function shouldSkipDuplicateLanguageInteraction() {
@@ -543,6 +554,12 @@ function beginActiveGame() {
 }
 
 function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
+  if (secondsRemaining === COUNTDOWN_SECONDS) {
+    trackAnalyticsEvent('game_start', {
+      language: currentLanguage,
+    });
+  }
+
   clearCountdownTimer();
   isGameActive = false;
   isOnStartScreen = false;
@@ -581,6 +598,7 @@ function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
 function finishGame() {
   isGameActive = false;
   const elapsedMs = performance.now() - startTime;
+  const elapsedSeconds = Number((elapsedMs / 1000).toFixed(2));
   lastResult = {
     elapsedMs,
     errorCount,
@@ -594,6 +612,11 @@ function finishGame() {
   updateStatusText();
   scrollAppToTop();
   resultText.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  trackAnalyticsEvent('game_complete', {
+    language: currentLanguage,
+    elapsed_seconds: elapsedSeconds,
+    error_count: errorCount,
+  });
 }
 
 function formatElapsedTime(elapsedMs) {
