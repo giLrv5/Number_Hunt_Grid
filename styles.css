@@ -395,10 +395,14 @@ h1 {
     padding: 12px 14px;
   }
 
-  .start-button,
-  .status {
+  .controls .start-button {
     width: fit-content;
     max-width: 100%;
+  }
+
+  .start-button--hero {
+    width: clamp(92px, 30vw, 108px);
+    height: clamp(92px, 30vw, 108px);
   }
 
   .result-metrics {
