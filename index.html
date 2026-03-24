@@ -23,9 +23,25 @@
 </head>
 <body>
   <main class="app">
-    <p class="brand">碩仁的專注力練習</p>
-    <h1>舒爾特方格（1~25）</h1>
-    <p class="intro">依序點擊 1 到 25。點擊「開始」後才會顯示方格內容。</p>
+    <header class="app-header">
+      <div>
+        <p id="brand" class="brand">碩仁的專注力練習</p>
+        <h1 id="pageTitle">舒爾特方格（1~25）</h1>
+      </div>
+      <div class="language-switcher" role="group" aria-label="Language switcher">
+        <button id="langZhButton" class="language-button is-active" type="button" aria-pressed="true">中文</button>
+        <button id="langEnButton" class="language-button" type="button" aria-pressed="false">EN</button>
+      </div>
+    </header>
+
+    <p id="intro" class="intro">依序點擊 1 到 25。點擊「開始」後才會顯示方格內容。</p>
+    <p id="deviceHint" class="device-hint hidden"></p>
+
+    <section id="startScreen" class="start-screen">
+      <h2 id="startScreenTitle" class="start-screen-title">準備好了就開始</h2>
+      <p id="startScreenText" class="start-screen-text">按下按鈕後會先倒數，再正式開始測驗。</p>
+      <button id="heroStartButton" class="start-button" type="button">開始</button>
+    </section>
 
     <div class="controls">
       <button id="startButton" class="start-button" type="button">開始</button>
