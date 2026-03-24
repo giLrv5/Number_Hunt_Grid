@@ -124,6 +124,17 @@ h1 {
   color: var(--ink-700);
 }
 
+.device-hint {
+  margin: -4px 0 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid #ffd49f;
+  background: #fff8ef;
+  color: #8a4a00;
+  line-height: 1.55;
+  font-weight: 600;
+}
+
 .note-group + .note-group {
   margin-top: 16px;
   padding-top: 16px;
