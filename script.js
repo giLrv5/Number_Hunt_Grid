@@ -1,7 +1,6 @@
 const startButton = document.getElementById('startButton');
 const heroStartButton = document.getElementById('heroStartButton');
 const startScreen = document.getElementById('startScreen');
-const statusText = document.getElementById('status');
 const countdownText = document.getElementById('countdown');
 const grid = document.getElementById('grid');
 const resultText = document.getElementById('result');
@@ -211,27 +210,7 @@ function updateLanguageButtons() {
 }
 
 function updateStatusText() {
-  const text = getText();
-
-  if (isGameActive) {
-    statusText.textContent = text.findNumber(expectedNumber);
-    return;
-  }
-
-  if (!countdownText.classList.contains('hidden')) {
-    const secondsRemaining = Number(countdownText.textContent);
-    if (!Number.isNaN(secondsRemaining) && secondsRemaining > 0) {
-      statusText.textContent = text.countdownStatus(secondsRemaining);
-      return;
-    }
-  }
-
-  if (!resultText.classList.contains('hidden') && lastResult) {
-    statusText.textContent = text.completed;
-    return;
-  }
-
-  statusText.textContent = text.notStarted;
+  // Intentionally kept as a no-op because status text is hidden per UI request.
 }
 
 function renderResult() {
@@ -479,7 +458,6 @@ function resetToIdleState() {
   resultText.innerHTML = '';
   startScreen.classList.remove('hidden');
   startButton.classList.add('hidden');
-  statusText.classList.add('hidden');
   startButton.disabled = false;
   heroStartButton.disabled = false;
   updateDeviceHintVisibility(false);
@@ -542,7 +520,6 @@ function beginActiveGame() {
   resultText.classList.add('hidden');
   resultText.innerHTML = '';
   startButton.classList.remove('hidden');
-  statusText.classList.remove('hidden');
   grid.classList.remove('hidden');
   startButton.disabled = false;
   heroStartButton.disabled = false;
@@ -574,7 +551,6 @@ function startCountdown(secondsRemaining = COUNTDOWN_SECONDS) {
   resultText.innerHTML = '';
   grid.innerHTML = '';
   startButton.classList.remove('hidden');
-  statusText.classList.remove('hidden');
   startButton.disabled = true;
   heroStartButton.disabled = true;
   updateDeviceHintVisibility(false);
