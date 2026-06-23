@@ -18,7 +18,29 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta id="metaDescription" name="description" content="碩仁的專注力練習提供舒爾特方格 1 到 25 點擊測驗，透過計時與錯誤次數回饋，協助兒童與學生練習視覺搜尋、專注力與衝動控制。" />
+  <meta name="robots" content="index,follow" />
+  <meta name="theme-color" content="#2f63ff" />
+  <meta id="ogTitle" property="og:title" content="碩仁的專注力練習" />
+  <meta id="ogDescription" property="og:description" content="使用舒爾特方格 1 到 25 點擊測驗，練習視覺搜尋與專注力，完成後查看耗時與錯誤次數。" />
+  <meta property="og:type" content="website" />
+  <meta id="ogLocale" property="og:locale" content="zh_TW" />
+  <meta id="twitterTitle" name="twitter:title" content="碩仁的專注力練習" />
+  <meta id="twitterDescription" name="twitter:description" content="使用舒爾特方格 1 到 25 點擊測驗，練習視覺搜尋與專注力，完成後查看耗時與錯誤次數。" />
+  <meta name="twitter:card" content="summary" />
   <title>碩仁的專注力練習</title>
+  <script id="structuredData" type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalApplication",
+      "name": "碩仁的專注力練習",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web",
+      "inLanguage": ["zh-Hant", "en"],
+      "description": "舒爾特方格 1 到 25 點擊測驗，透過計時與錯誤次數回饋協助練習視覺搜尋與專注力。",
+      "isAccessibleForFree": true
+    }
+  </script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -28,7 +50,7 @@
         <p id="brand" class="brand">碩仁的專注力練習</p>
         <h1 id="pageTitle">舒爾特方格（1~25）</h1>
       </div>
-      <div class="language-switcher" role="group" aria-label="Language switcher">
+      <div id="languageSwitcher" class="language-switcher" role="group" aria-label="語言切換">
         <button id="langZhButton" class="language-button is-active" type="button" aria-pressed="true">中文</button>
         <button id="langEnButton" class="language-button" type="button" aria-pressed="false">EN</button>
       </div>
@@ -48,7 +70,8 @@
     </div>
 
     <div id="countdown" class="countdown hidden" aria-live="assertive"></div>
-    <div id="grid" class="grid hidden" aria-live="polite"></div>
+    <p id="gameStatus" class="sr-only" aria-live="polite">尚未開始</p>
+    <div id="grid" class="grid hidden" role="grid" aria-label="舒爾特方格 1 到 25" aria-describedby="gameStatus"></div>
 
     <section id="result" class="result hidden" aria-live="polite"></section>
   </main>
