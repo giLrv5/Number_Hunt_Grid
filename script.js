@@ -3,6 +3,7 @@ const heroStartButton = document.getElementById('heroStartButton');
 const startScreen = document.getElementById('startScreen');
 const countdownText = document.getElementById('countdown');
 const grid = document.getElementById('grid');
+const gameStatusText = document.getElementById('gameStatus');
 const resultText = document.getElementById('result');
 const app = document.querySelector('.app');
 const brandText = document.getElementById('brand');
@@ -13,6 +14,14 @@ const startScreenTitle = document.getElementById('startScreenTitle');
 const startScreenText = document.getElementById('startScreenText');
 const langZhButton = document.getElementById('langZhButton');
 const langEnButton = document.getElementById('langEnButton');
+const languageSwitcher = document.getElementById('languageSwitcher');
+const metaDescription = document.getElementById('metaDescription');
+const ogTitle = document.getElementById('ogTitle');
+const ogDescription = document.getElementById('ogDescription');
+const ogLocale = document.getElementById('ogLocale');
+const twitterTitle = document.getElementById('twitterTitle');
+const twitterDescription = document.getElementById('twitterDescription');
+const structuredData = document.getElementById('structuredData');
 
 const TOTAL = 25;
 const COUNTDOWN_SECONDS = 3;
@@ -23,6 +32,13 @@ const I18N = {
   zh: {
     htmlLang: 'zh-Hant',
     documentTitle: '碩仁的專注力練習',
+    metaDescription: '碩仁的專注力練習提供舒爾特方格 1 到 25 點擊測驗，透過計時與錯誤次數回饋，協助兒童與學生練習視覺搜尋、專注力與衝動控制。',
+    socialDescription: '使用舒爾特方格 1 到 25 點擊測驗，練習視覺搜尋與專注力，完成後查看耗時與錯誤次數。',
+    ogLocale: 'zh_TW',
+    structuredDataDescription: '舒爾特方格 1 到 25 點擊測驗，透過計時與錯誤次數回饋協助練習視覺搜尋與專注力。',
+    gridLabel: '舒爾特方格 1 到 25',
+    cellLabel: (value) => `數字 ${value}`,
+    languageSwitcherLabel: '語言切換',
     brand: '碩仁的專注力練習',
     pageTitle: '舒爾特方格（1~25）',
     intro: '依序點擊 1 到 25。點擊「開始」後才會顯示方格內容。',
@@ -87,6 +103,13 @@ const I18N = {
   en: {
     htmlLang: 'en',
     documentTitle: 'Shuo-Ren’s Focus Training',
+    metaDescription: 'Shuo-Ren’s Focus Training is a Schulte Grid 1 to 25 tapping activity that gives time and error feedback to support visual scanning, focus, and impulse-control practice.',
+    socialDescription: 'Practice visual scanning and focus with a Schulte Grid 1 to 25 tapping activity, then review your time and errors.',
+    ogLocale: 'en_US',
+    structuredDataDescription: 'A Schulte Grid 1 to 25 tapping activity that uses time and error feedback to support visual scanning and focus practice.',
+    gridLabel: 'Schulte Grid 1 to 25',
+    cellLabel: (value) => `Number ${value}`,
+    languageSwitcherLabel: 'Language switcher',
     brand: 'Shuo-Ren’s Focus Training',
     pageTitle: 'Schulte Grid (1–25)',
     intro: 'Tap the numbers from 1 to 25 in order. The grid will appear only after you press “Start.”',
@@ -210,7 +233,21 @@ function updateLanguageButtons() {
 }
 
 function updateStatusText() {
-  // Intentionally kept as a no-op because status text is hidden per UI request.
+  const text = getText();
+
+  if (!gameStatusText) {
+    return;
+  }
+
+  if (isGameActive) {
+    gameStatusText.textContent = text.findNumber(expectedNumber);
+  } else if (!countdownText.classList.contains('hidden')) {
+    gameStatusText.textContent = text.countdownStatus(countdownText.textContent);
+  } else if (lastResult) {
+    gameStatusText.textContent = text.completed;
+  } else {
+    gameStatusText.textContent = text.notStarted;
+  }
 }
 
 function renderResult() {
@@ -244,10 +281,34 @@ function renderResult() {
   resultText.classList.remove('hidden');
 }
 
+function updateSeoMetadata() {
+  const text = getText();
+
+  metaDescription.setAttribute('content', text.metaDescription);
+  ogTitle.setAttribute('content', text.documentTitle);
+  ogDescription.setAttribute('content', text.socialDescription);
+  ogLocale.setAttribute('content', text.ogLocale);
+  twitterTitle.setAttribute('content', text.documentTitle);
+  twitterDescription.setAttribute('content', text.socialDescription);
+  structuredData.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'EducationalApplication',
+    name: text.documentTitle,
+    applicationCategory: 'EducationalApplication',
+    operatingSystem: 'Web',
+    inLanguage: ['zh-Hant', 'en'],
+    description: text.structuredDataDescription,
+    isAccessibleForFree: true,
+  });
+}
+
 function updateStaticTexts() {
   const text = getText();
   document.documentElement.lang = text.htmlLang;
   document.title = text.documentTitle;
+  updateSeoMetadata();
+  languageSwitcher.setAttribute('aria-label', text.languageSwitcherLabel);
+  grid.setAttribute('aria-label', text.gridLabel);
   brandText.textContent = text.brand;
   pageTitle.textContent = text.pageTitle;
   introText.textContent = text.intro;
@@ -484,6 +545,8 @@ function buildGrid() {
     cell.type = 'button';
     cell.className = 'cell';
     cell.textContent = String(value);
+    cell.setAttribute('aria-label', getText().cellLabel(value));
+    cell.setAttribute('role', 'gridcell');
     cell.dataset.value = String(value);
     grid.appendChild(cell);
   });
